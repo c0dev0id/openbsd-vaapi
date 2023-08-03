@@ -41,9 +41,18 @@ cd /usr/xenocara/lib    && patch -p0 < $DIR/glue/patch-lib-Makefile.diff
 
 # patch vainfo
 cd /usr/xenocara/app/vainfo && patch -p0 < $DIR/glue/patch-app-vainfo.diff
-cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-lib-intel-vaapi-driver.diff
 
+# patch libva
+# not needed cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va-c.diff
+# not needed cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va_trace-c.diff
 
+# patch intel-vaapi-driver
+cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver-intel-vaapi-driver.diff
+# not needed cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver-intel-vaapi-driver-src_i965_encoder_utils_c.diff
+
+# patch mesa
+# not needed cd /usr/xenocara/lib/mesa && patch -p0 < $DIR/glue/patch-lib-mesa-meson_build.diff
+# not needed cd /usr/xenocara/lib/mesa && patch -p0 < $DIR/glue/patch-lib-mesa-src-meson_build.diff
 
 # this won't work for you
 chown -R sdk /usr/xenocara
