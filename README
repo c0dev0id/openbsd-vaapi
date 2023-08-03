@@ -1,13 +1,25 @@
+This is WIP and not building yet.
+
+TODO:
+ - make libva build, the build system wants to rebuild configure.ac but it
+   shouldn't.
+ - glue code for lib/mesa. The original patch sets --enable-va in the mesa
+   Makefile. Mesa since has been changed to meson. va needs to be enabled
+   here.
+
+----
+
 1. execute ./backup_xenocara.sh
     This will rsync /usr/xenocara to the backup directory.
 
 2. execute ./install_vaapi.sh
-    This will restore xenocara, then download/patch/install vaapi
+    This will restore xenocara, then download/patch/install vaapi and the
+build xenocara
 
 If you want to update xenocara from cvs:
     1. run ./restore_xenocara.sh
     2. update from cvs
     3. run ./backup_xenocara.sh
 
-Read the install_vaapi.sh script, it has some user specific stuff (chmod) in
-it and builds xenocara at the end. you may not want this.
+*Read the install_vaapi.sh script, it has some user specific stuff (chmod) in
+it and builds xenocara at the end. you may not want this.*
