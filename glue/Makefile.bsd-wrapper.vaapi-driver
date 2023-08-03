@@ -1,0 +1,7 @@
+# $OpenBSD$
+
+afterinstall:
+	rm ${DESTDIR}${LIBDIR}/dri/i965_drv_video.la
+
+.include <bsd.xorg.mk>
+

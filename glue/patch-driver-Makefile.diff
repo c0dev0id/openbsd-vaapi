@@ -1,0 +1,17 @@
+Index: Makefile
+===================================================================
+RCS file: /cvs/xenocara/driver/Makefile,v
+retrieving revision 1.79
+diff -u -p -u -p -r1.79 Makefile
+--- Makefile	25 Jun 2021 19:32:01 -0000	1.79
++++ Makefile	1 Aug 2023 18:42:30 -0000
+@@ -52,7 +52,8 @@ VIDEO_DRV_amd64= \
+ 	xf86-video-nv xf86-video-openchrome xf86-video-r128 \
+ 	xf86-video-savage xf86-video-siliconmotion \
+ 	xf86-video-vesa xf86-video-vmware \
+-	xf86-video-wsfb xf86-video-wsudl
++	xf86-video-wsfb xf86-video-wsudl \
++	intel-vaapi-driver
+ 
+ VIDEO_DRV_arm64= \
+ 	xf86-video-amdgpu xf86-video-ati xf86-video-wsfb xf86-video-wsudl

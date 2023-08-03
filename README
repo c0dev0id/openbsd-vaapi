@@ -1,0 +1,13 @@
+1. execute ./backup_xenocara.sh
+    This will rsync /usr/xenocara to the backup directory.
+
+2. execute ./install_vaapi.sh
+    This will restore xenocara, then download/patch/install vaapi
+
+If you want to update xenocara from cvs:
+    1. run ./restore_xenocara.sh
+    2. update from cvs
+    3. run ./backup_xenocara.sh
+
+Read the install_vaapi.sh script, it has some user specific stuff (chmod) in
+it and builds xenocara at the end. you may not want this.

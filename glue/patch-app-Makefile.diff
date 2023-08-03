@@ -1,0 +1,16 @@
+Index: Makefile
+===================================================================
+RCS file: /cvs/xenocara/app/Makefile,v
+retrieving revision 1.38
+diff -u -p -u -p -r1.38 Makefile
+--- Makefile	15 Aug 2019 17:01:12 -0000	1.38
++++ Makefile	1 Aug 2023 18:42:54 -0000
+@@ -18,7 +18,7 @@ SUBDIR= bdftopcf mkfontscale \
+ 
+ # GL
+ .if ${XENOCARA_BUILD_GL:L} == "yes"
+-SUBDIR +=   xdriinfo glxgears glxinfo
++SUBDIR +=   xdriinfo glxgears glxinfo vainfo
+ .endif
+ 
+ # extras
