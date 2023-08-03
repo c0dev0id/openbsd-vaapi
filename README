@@ -1,11 +1,14 @@
 This is WIP and not building yet.
 
-TODO:
- - make libva build, the build system wants to rebuild configure.ac but it
-   shouldn't.
- - glue code for lib/mesa. The original patch sets --enable-va in the mesa
-   Makefile. Mesa since has been changed to meson. va needs to be enabled
-   here.
+It contains:
+
+ - vainfo
+ - libva
+ - intel-vaapi-driver
+
+It does *not* contain:
+
+ - libva-drm.
 
 ----
 
