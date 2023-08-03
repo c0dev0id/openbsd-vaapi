@@ -10,8 +10,10 @@ mkdir -p $DIR/tmp
 cd $DIR/tmp
 
 # versions... so we can upgrade easily
-VA=2.17.0
-VA_UTIL=2.17.1
+#VA=2.17.0
+VA=2.19.0
+#VA_UTIL=2.17.1
+VA_UTIL=2.19.0
 VA_DRV=2.4.1
 
 # download required archives
@@ -43,8 +45,8 @@ cd /usr/xenocara/lib    && patch -p0 < $DIR/glue/patch-lib-Makefile.diff
 cd /usr/xenocara/app/vainfo && patch -p0 < $DIR/glue/patch-app-vainfo.diff
 
 # patch libva
-# not needed cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va-c.diff
-# not needed cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va_trace-c.diff
+# not needed (upstream) cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va-c.diff
+# not needed (upstream) cd /usr/xenocara/lib/libva && patch -p0 < $DIR/glue/patch-lib-libva-va-va_trace-c.diff
 
 # patch intel-vaapi-driver
 cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver-intel-vaapi-driver.diff
