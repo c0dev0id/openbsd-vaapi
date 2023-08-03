@@ -39,6 +39,12 @@ cd /usr/xenocara/app    && patch -p0 < $DIR/glue/patch-app-Makefile.diff
 cd /usr/xenocara/driver && patch -p0 < $DIR/glue/patch-driver-Makefile.diff
 cd /usr/xenocara/lib    && patch -p0 < $DIR/glue/patch-lib-Makefile.diff
 
+# patch vainfo
+cd /usr/xenocara/app/vainfo && patch -p0 < $DIR/glue/patch-app-vainfo.diff
+cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-lib-intel-vaapi-driver.diff
+
+
+
 # this won't work for you
 chown -R sdk /usr/xenocara
 
