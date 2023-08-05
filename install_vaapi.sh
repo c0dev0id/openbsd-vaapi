@@ -52,6 +52,7 @@ cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver
     export AUTOCONF_VERSION=2.69
     export AUTOMAKE_VERSION=1.12
     cd /usr/xenocara/lib/libva && autoreconf
+    cd /usr/xenocara/app/vainfo && autoreconf
 )
 
 # this won't work for you
