@@ -47,6 +47,13 @@ cd /usr/xenocara/app/vainfo && patch -p0 < $DIR/glue/patch-app-vainfo.diff
 # patch intel-vaapi-driver
 cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver-intel-vaapi-driver.diff
 
+# libva is configured with a newer autoconf/make, we need to redo it with an older one, so xenocara can build it
+(
+    export AUTOCONF_VERSION=2.69
+    export AUTOMAKE_VERSION=1.12
+    cd /usr/xenocara/lib/libva && autoreconf
+)
+
 # this won't work for you
 chown -R sdk /usr/xenocara
 
@@ -55,6 +62,6 @@ cd /usr/xenocara
 doas rm -rf /usr/xobj/*
 doas make bootstrap
 doas make obj
-doas make -j8 build
+doas make -j10 build
 #doas make install
 
