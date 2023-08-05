@@ -3,12 +3,8 @@ This is WIP and not building yet.
 It contains:
 
  - vainfo
- - libva
+ - libva(-drm)
  - intel-vaapi-driver
-
-It does *not* contain:
-
- - libva-drm.
 
 ----
 
