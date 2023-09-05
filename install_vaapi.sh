@@ -1,68 +1,81 @@
 #!/bin/sh -xe
 DIR=$PWD
 
-# restore xenocara from backup (only works if ./backup_xenocara.sh has been run)
-./restore_xenocara.sh
+
+# restore if we have a backup
+if [ -d backup/xenocara ]
+then
+    rsync -aHilpt --delete backup/xenocara/ /usr/xenocara
+else
+    mkdir -p backup/xenocara
+    rsync -aHilpt --delete /usr/xenocara/ backup/xenocara
+fi
 
 # delete whatever is left from the last run
 rm -rf $DIR/tmp
 mkdir -p $DIR/tmp
 cd $DIR/tmp
 
-# versions... so we can upgrade easily
-#VA=2.17.0
+# CACHE
+export CCACHE_DIR="$DIR/ccache"
+mkdir -p "$CCACHE_DIR"
+export CCACHE_SLOPPINESS="locale,time_macros,random_seed"
+export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
+export CMAKE_C_COMPILER_LAUNCHER="ccache"
+export PATH="/opt/ccache/bin:$PATH"
+
+# VAAPI RELEVANT PART BELOW
+
+export AUTOCONF_VERSION=2.69
+export AUTOMAKE_VERSION=1.16
+
+#
+# ADD LIBVA TO XENOCARA
+#
 VA=2.19.0
-#VA_UTIL=2.17.1
-VA_UTIL=2.19.0
-VA_DRV=2.4.1
-
-# download required archives
 ftp https://github.com/intel/libva/releases/download/$VA/libva-$VA.tar.bz2
-ftp https://github.com/intel/libva-utils/releases/download/$VA_UTIL/libva-utils-$VA_UTIL.tar.bz2
-ftp https://github.com/intel/intel-vaapi-driver/releases/download/$VA_DRV/intel-vaapi-driver-$VA_DRV.tar.bz2
-
-# extract archives
 tar xjvf libva-$VA.tar.bz2
+cp -r libva-$VA /usr/xenocara/lib/libva
+cp $DIR/glue/Makefile.bsd-wrapper.libva /usr/xenocara/lib/libva/Makefile.bsd-wrapper
+cd /usr/xenocara/lib && patch -p0 < $DIR/glue/patch-lib-Makefile.diff
+cd /usr/xenocara/lib/libva && autoupdate && autoreconf -i --force
+rm -rf /usr/X11R6/include/va
+mkdir -p /usr/X11R6/include/va
+chmod 777 /usr/X11R6/include/va
+
+#
+# ADD VAINFO TO XENOCARA
+#
+VA_UTIL=2.19.0
+ftp https://github.com/intel/libva-utils/releases/download/$VA_UTIL/libva-utils-$VA_UTIL.tar.bz2
 tar xjvf libva-utils-$VA_UTIL.tar.bz2
-tar xjvf intel-vaapi-driver-$VA_DRV.tar.bz2
-
-# copy dirs to xenocara
-cp -r libva-utils-$VA_UTIL       /usr/xenocara/app/vainfo
-cp -r libva-$VA                  /usr/xenocara/lib/libva
-cp -r intel-vaapi-driver-$VA_DRV /usr/xenocara/driver/intel-vaapi-driver
-
-# copy glue bsd.wrappers
-cp ../glue/Makefile.bsd-wrapper.vainfo       /usr/xenocara/app/vainfo/Makefile.bsd-wrapper
-cp ../glue/Makefile.bsd-wrapper.libva        /usr/xenocara/lib/libva/Makefile.bsd-wrapper
-cp ../glue/Makefile.bsd-wrapper.vaapi-driver /usr/xenocara/driver/intel-vaapi-driver/Makefile.bsd-wrapper
-
-# include new directories into Makefiles
-cd /usr/xenocara/app    && patch -p0 < $DIR/glue/patch-app-Makefile.diff
-cd /usr/xenocara/driver && patch -p0 < $DIR/glue/patch-driver-Makefile.diff
-cd /usr/xenocara/lib    && patch -p0 < $DIR/glue/patch-lib-Makefile.diff
-
-# patch vainfo
+cp -r libva-utils-$VA_UTIL /usr/xenocara/app/vainfo
+cp $DIR/glue/Makefile.bsd-wrapper.vainfo /usr/xenocara/app/vainfo/Makefile.bsd-wrapper
 cd /usr/xenocara/app/vainfo && patch -p0 < $DIR/glue/patch-app-vainfo.diff
+cd /usr/xenocara/app && patch -p0 < $DIR/glue/patch-app-Makefile.diff
+cd /usr/xenocara/app/vainfo && autoupdate && autoreconf -i --force
 
-# patch intel-vaapi-driver
+#
+# ADD INTEL VAAPI DRIVER TO XENOCARA
+#
+VA_DRV=2.4.1
+ftp https://github.com/intel/intel-vaapi-driver/releases/download/$VA_DRV/intel-vaapi-driver-$VA_DRV.tar.bz2
+tar xjvf intel-vaapi-driver-$VA_DRV.tar.bz2
+cp -r intel-vaapi-driver-$VA_DRV /usr/xenocara/driver/intel-vaapi-driver
+cp $DIR/glue/Makefile.bsd-wrapper.vaapi-driver /usr/xenocara/driver/intel-vaapi-driver/Makefile.bsd-wrapper
 cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver-intel-vaapi-driver.diff
+cd /usr/xenocara/driver && patch -p0 < $DIR/glue/patch-driver-Makefile.diff
+cd /usr/xenocara/driver/intel-vaapi-driver && autoupdate && autoreconf -i --force
 
-# libva is configured with a newer autoconf/make, we need to redo it with an older one, so xenocara can build it
-(
-    export AUTOCONF_VERSION=2.69
-    export AUTOMAKE_VERSION=1.12
-    cd /usr/xenocara/lib/libva && autoreconf
-    cd /usr/xenocara/app/vainfo && autoreconf
-)
+# VAAPI RELEVANT PART ABOVE
 
 # this won't work for you
 chown -R sdk /usr/xenocara
 
-# build xenocara
+# BUILD XENOCARA
 cd /usr/xenocara
 doas rm -rf /usr/xobj/*
 doas make bootstrap
 doas make obj
-doas make -j10 build
-#doas make install
-
+doas make -j8 build
+doas make install
