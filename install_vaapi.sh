@@ -1,8 +1,10 @@
 #!/bin/sh -xe
+
+#
+# BOILERPLATE
+#
 DIR=$PWD
-
-
-# restore if we have a backup
+# backup / restore xenocara
 if [ -d backup/xenocara ]
 then
     rsync -aHilpt --delete backup/xenocara/ /usr/xenocara
@@ -10,24 +12,16 @@ else
     mkdir -p backup/xenocara
     rsync -aHilpt --delete /usr/xenocara/ backup/xenocara
 fi
-
 # delete whatever is left from the last run
 rm -rf $DIR/tmp
 mkdir -p $DIR/tmp
 cd $DIR/tmp
 
-# CACHE
-export CCACHE_DIR="$DIR/ccache"
-mkdir -p "$CCACHE_DIR"
-export CCACHE_SLOPPINESS="locale,time_macros,random_seed"
-export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
-export CMAKE_C_COMPILER_LAUNCHER="ccache"
-export PATH="/opt/ccache/bin:$PATH"
-
-# VAAPI RELEVANT PART BELOW
-
 export AUTOCONF_VERSION=2.69
 export AUTOMAKE_VERSION=1.16
+#
+# /BOILERPLATE
+#
 
 #
 # ADD LIBVA TO XENOCARA
@@ -67,15 +61,5 @@ cd /usr/xenocara/driver/intel-vaapi-driver && patch -p0 < $DIR/glue/patch-driver
 cd /usr/xenocara/driver && patch -p0 < $DIR/glue/patch-driver-Makefile.diff
 cd /usr/xenocara/driver/intel-vaapi-driver && autoupdate && autoreconf -i --force
 
-# VAAPI RELEVANT PART ABOVE
 
-# this won't work for you
-chown -R sdk /usr/xenocara
-
-# BUILD XENOCARA
-cd /usr/xenocara
-doas rm -rf /usr/xobj/*
-doas make bootstrap
-doas make obj
-doas make -j8 build
-doas make install
+echo "no go and build xenocara"
