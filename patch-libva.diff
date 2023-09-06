@@ -1,0 +1,75 @@
+diff --git a/lib/Makefile b/lib/Makefile
+index 90a3bcce..c6cc76fe 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -51,6 +51,7 @@ SUBDIR+= libxshmfence
+ 
+ .if ${XENOCARA_BUILD_GL:L} == "yes"
+ SUBDIR+= libdrm
++SUBDIR+= libva
+ SUBDIR+= mesa
+ SUBDIR+= libGLU libGLw
+ SUBDIR+= libepoxy
+diff --git a/lib/libva/Makefile.bsd-wrapper b/lib/libva/Makefile.bsd-wrapper
+new file mode 100644
+index 00000000..e85ec9a8
+--- /dev/null
++++ b/lib/libva/Makefile.bsd-wrapper
+@@ -0,0 +1,8 @@
++# $OpenBSD$
++
++SHARED_LIBS =  va 0.0 \
++SHARED_LIBS += va-drm 0.0 \
++SHARED_LIBS += va-x11 0.0 \
++SHARED_LIBS += va-glx 0.0
++
++.include <bsd.xorg.mk>
+diff --git a/lib/libva/va/Makefile.am b/lib/libva/va/Makefile.am
+index 8d16d422..faf7fd41 100644
+--- a/lib/libva/va/Makefile.am
++++ b/lib/libva/va/Makefile.am
+@@ -92,7 +92,7 @@ libva_la_SOURCES		= $(libva_source_c)
+ libva_la_CFLAGS			= $(libva_cflags)
+ libva_la_LDFLAGS		= $(libva_ldflags)
+ libva_la_DEPENDENCIES		= libva.syms
+-libva_la_LIBADD			= $(LIBVA_LIBS)
++libva_la_LIBADD			= $(LIBVA_LIBS) $(DLOPEN_LIBS)
+ 
+ if USE_DRM
+ SUBDIRS				+= drm
+@@ -102,7 +102,7 @@ libva_drm_la_CFLAGS		= $(libva_cflags)
+ libva_drm_la_LDFLAGS		= $(LDADD)
+ libva_drm_la_DEPENDENCIES	= libva.la drm/libva_drm.la
+ libva_drm_la_LIBADD		= libva.la drm/libva_drm.la \
+-	$(LIBVA_LIBS) $(DRM_LIBS)
++	$(LIBVA_LIBS) $(DRM_LIBS) $(DLOPEN_LIBS)
+ endif
+ 
+ if USE_X11
+@@ -114,7 +114,7 @@ libva_x11_la_CFLAGS		= $(libva_cflags)
+ libva_x11_la_LDFLAGS		= $(LDADD)
+ libva_x11_la_DEPENDENCIES	= libva.la x11/libva_x11.la
+ libva_x11_la_LIBADD		= libva.la x11/libva_x11.la \
+-	$(LIBVA_LIBS) $(X11_LIBS) $(XEXT_LIBS) $(XFIXES_LIBS) $(DRM_LIBS)
++	$(LIBVA_LIBS) $(X11_LIBS) $(XEXT_LIBS) $(XFIXES_LIBS) $(DRM_LIBS) $(DLOPEN_LIBS)
+ endif
+ 
+ if USE_GLX
+@@ -125,7 +125,7 @@ libva_glx_la_CFLAGS		= $(libva_cflags)
+ libva_glx_la_LDFLAGS		= $(LDADD)
+ libva_glx_la_DEPENDENCIES	= libva.la glx/libva_glx.la libva-x11.la
+ libva_glx_la_LIBADD		= libva.la glx/libva_glx.la libva-x11.la \
+-	$(GLX_LIBS)
++	$(GLX_LIBS) $(DLOPEN_LIBS)
+ endif
+ 
+ if USE_WAYLAND
+@@ -136,7 +136,7 @@ libva_wayland_la_CFLAGS		= $(libva_cflags)
+ libva_wayland_la_LDFLAGS	= $(LDADD)
+ libva_wayland_la_DEPENDENCIES	= libva.la wayland/libva_wayland.la
+ libva_wayland_la_LIBADD		= libva.la wayland/libva_wayland.la \
+-	$(WAYLAND_LIBS) $(DRM_LIBS)
++	$(WAYLAND_LIBS) $(DRM_LIBS) $(DLOPEN_LIBS)
+ endif
+ 
+ DIST_SUBDIRS = x11 glx drm wayland

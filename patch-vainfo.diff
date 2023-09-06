@@ -1,0 +1,47 @@
+diff --git a/app/Makefile b/app/Makefile
+index c9926c2a..7a564ecb 100644
+--- a/app/Makefile
++++ b/app/Makefile
+@@ -18,7 +18,7 @@ SUBDIR= bdftopcf mkfontscale \
+ 
+ # GL
+ .if ${XENOCARA_BUILD_GL:L} == "yes"
+-SUBDIR +=   xdriinfo glxgears glxinfo
++SUBDIR +=   xdriinfo glxgears glxinfo vainfo
+ .endif
+ 
+ # extras
+diff --git a/app/vainfo/Makefile.am b/app/vainfo/Makefile.am
+index d28175ae..156fb6b4 100644
+--- a/app/vainfo/Makefile.am
++++ b/app/vainfo/Makefile.am
+@@ -24,19 +24,8 @@ ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+ 
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = common decode encode vainfo videoprocess vendor/intel vendor/intel/sfcsample
++SUBDIRS = common vainfo
+ 
+-if USE_X11
+-SUBDIRS += putsurface
+-else
+-if USE_WAYLAND
+-SUBDIRS += putsurface
+-endif
+-endif
+-
+-if ENABLE_TESTS
+-SUBDIRS += test
+-endif
+ 
+ # Extra clean files so that maintainer-clean removes *everything*
+ MAINTAINERCLEANFILES = \
+diff --git a/app/vainfo/Makefile.bsd-wrapper b/app/vainfo/Makefile.bsd-wrapper
+new file mode 100644
+index 00000000..3ad14575
+--- /dev/null
++++ b/app/vainfo/Makefile.bsd-wrapper
+@@ -0,0 +1,3 @@
++# $OpenBSD$
++
++.include <bsd.xorg.mk>

@@ -1,0 +1,91 @@
+diff --git a/driver/Makefile b/driver/Makefile
+index 52c8af0c..24fba5e2 100644
+--- a/driver/Makefile
++++ b/driver/Makefile
+@@ -52,7 +52,8 @@ VIDEO_DRV_amd64= \
+ 	xf86-video-nv xf86-video-openchrome xf86-video-r128 \
+ 	xf86-video-savage xf86-video-siliconmotion \
+ 	xf86-video-vesa xf86-video-vmware \
+-	xf86-video-wsfb xf86-video-wsudl
++	xf86-video-wsfb xf86-video-wsudl \
++	intel-vaapi-driver
+ 
+ VIDEO_DRV_arm64= \
+ 	xf86-video-amdgpu xf86-video-ati xf86-video-wsfb xf86-video-wsudl
+diff --git a/driver/intel-vaapi-driver/Makefile.bsd-wrapper b/driver/intel-vaapi-driver/Makefile.bsd-wrapper
+new file mode 100644
+index 00000000..bf4da6e1
+--- /dev/null
++++ b/driver/intel-vaapi-driver/Makefile.bsd-wrapper
+@@ -0,0 +1,7 @@
++# $OpenBSD$
++
++afterinstall:
++	rm ${DESTDIR}${LIBDIR}/dri/i965_drv_video.la
++
++.include <bsd.xorg.mk>
++
+diff --git a/driver/intel-vaapi-driver/meson.build b/driver/intel-vaapi-driver/meson.build
+index 438ac88e..9d9877f0 100644
+--- a/driver/intel-vaapi-driver/meson.build
++++ b/driver/intel-vaapi-driver/meson.build
+@@ -19,7 +19,7 @@ if version_arr.length() == 4
+ endif
+ 
+ cc = meson.get_compiler('c')
+-dl_dep = cc.find_library('dl')
++dl_dep = cc.find_library('dl', required : false)
+ mathlib_dep = cc.find_library('m', required : false)
+ 
+ git = find_program('git', required : false)
+diff --git a/driver/intel-vaapi-driver/src/i965_encoder_utils.c b/driver/intel-vaapi-driver/src/i965_encoder_utils.c
+index 8c9b83c1..aea9b9e1 100644
+--- a/driver/intel-vaapi-driver/src/i965_encoder_utils.c
++++ b/driver/intel-vaapi-driver/src/i965_encoder_utils.c
+@@ -82,6 +82,7 @@ struct __avc_bitstream {
+ 
+ typedef struct __avc_bitstream avc_bitstream;
+ 
++#ifndef swap32
+ static unsigned int
+ swap32(unsigned int val)
+ {
+@@ -92,6 +93,7 @@ swap32(unsigned int val)
+             (pval[2] << 8)      |
+             (pval[3] << 0));
+ }
++#endif
+ 
+ static void
+ avc_bitstream_start(avc_bitstream *bs)
+diff --git a/driver/intel-vaapi-driver/src/i965_output_dri.c b/driver/intel-vaapi-driver/src/i965_output_dri.c
+index 4d9da950..abe1eb55 100644
+--- a/driver/intel-vaapi-driver/src/i965_output_dri.c
++++ b/driver/intel-vaapi-driver/src/i965_output_dri.c
+@@ -30,7 +30,7 @@
+ #include "i965_output_dri.h"
+ #include "dso_utils.h"
+ 
+-#define LIBVA_X11_NAME "libva-x11.so.2"
++#define LIBVA_X11_NAME "libva-x11.so"
+ 
+ typedef struct dri_drawable *(*dri_get_drawable_func)(VADriverContextP ctx, XID drawable);
+ typedef union dri_buffer *(*dri_get_rendering_buffer_func)(VADriverContextP ctx, struct dri_drawable *d);
+diff --git a/driver/intel-vaapi-driver/src/i965_output_wayland.c b/driver/intel-vaapi-driver/src/i965_output_wayland.c
+index a6120b7b..5f40960b 100644
+--- a/driver/intel-vaapi-driver/src/i965_output_wayland.c
++++ b/driver/intel-vaapi-driver/src/i965_output_wayland.c
+@@ -36,10 +36,10 @@
+ #include "dso_utils.h"
+ 
+ /* We need mesa's libEGL, first try the soname of a glvnd enabled mesa build */
+-#define LIBEGL_NAME             "libEGL_mesa.so.0"
++#define LIBEGL_NAME             "libEGL_mesa.so"
+ /* Then fallback to plain libEGL.so.1 (which might not be mesa) */
+-#define LIBEGL_NAME_FALLBACK    "libEGL.so.1"
+-#define LIBWAYLAND_CLIENT_NAME  "libwayland-client.so.0"
++#define LIBEGL_NAME_FALLBACK    "libEGL.so"
++#define LIBWAYLAND_CLIENT_NAME  "libwayland-client.so"
+ 
+ typedef uint32_t (*wl_display_get_global_func)(struct wl_display *display,
+                                                const char *interface, uint32_t version);
